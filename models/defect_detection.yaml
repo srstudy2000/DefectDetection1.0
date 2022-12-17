@@ -1,0 +1,50 @@
+nc: 6
+depth_multiple: 0.33
+width_multiple: 0.25
+anchors:
+  - [10,13, 16,30, 33,23]
+  - [30,61, 62,45, 59,119]
+  - [116,90, 156,198, 373,326]
+
+backbone:
+  [
+    [ -1, 1, Conv, [ 64, 3, 1 ] ],
+    [ -1, 1, Conv, [ 64, 3, 2 ] ],
+    [ -1,1,feature_extraction_block,[ 64 ] ],
+    [ -1, 1, Conv, [ 128, 3, 2 ] ],
+    [ -1,1,feature_extraction_block,[ 128 ] ],
+    [ -1, 1, Conv, [ 256, 3, 2 ] ],
+    [ -1,1,feature_extraction_block,[ 256 ] ],
+    [ -1, 1, Conv, [ 512, 3, 2 ] ],
+    [ -1,1,feature_extraction_block,[ 512 ] ],
+    [ -1, 1, Conv, [ 1024, 3, 2 ] ],
+    [ -1,1,feature_extraction_block,[ 1024 ] ],
+  ]
+
+
+head:
+  [
+     [ -1, 1, SPPF, [ 1024, 5 ] ],
+    [ -1, 1, Conv, [ 512, 3, 1 ] ],
+    [ -1, 1, Conv, [ 512, 1, 1 ] ],
+    [ -1, 1, Conv, [ 512, 3, 1 ] ],
+    [ -1, 1, shortcut_block, [ 512 ] ],
+    [ -1, 1, att_block, [ 512 ] ],
+
+
+   [-1, 1, Conv, [512, 1, 1]],
+   [-1, 1, nn.Upsample, [None, 2, 'nearest']],
+   [[-1, 8], 1, Concat, [1]],
+    [ -1, 1, Conv, [ 512, 3, 1 ] ],
+    [ -1, 1, shortcut_block, [ 512 ] ],
+    [ -1, 1, att_block, [ 512 ] ],
+
+   [-1, 1, Conv, [256, 1, 1]],
+   [-1, 1, nn.Upsample, [None, 2, 'nearest']],
+   [[-1, 6], 1, Concat, [1]],
+    [ -1, 1, Conv, [ 512, 3, 1 ] ],
+    [ -1, 1, shortcut_block, [ 512 ] ],
+    [ -1, 1, att_block, [ 512 ] ],
+
+   [[16, 22, 28], 1, Detect, [nc, anchors]],
+  ]

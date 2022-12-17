@@ -1,0 +1,5 @@
+train: ../defect_detection/PCBData/images/train
+val: ../defect_detection/PCBData/images/val
+
+nc: 6
+names: ['0', '1', '2', '3', '4', '5']
